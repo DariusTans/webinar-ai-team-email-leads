@@ -1,0 +1,22 @@
+{
+  "name": "webinar-aiteam-lead",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Landing page + lead capture สำหรับ webinar \"จากคนใช้ AI สู่เจ้าของ AI Team\"",
+  "scripts": {
+    "dev": "vercel dev",
+    "leads:export": "node scripts/export-csv.js",
+    "test": "node scripts/smoke-test.mjs && node scripts/frontend-test.mjs && node scripts/email-preview.mjs --check"
+  },
+  "dependencies": {
+    "pg": "^8.13.1",
+    "resend": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

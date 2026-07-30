@@ -3,10 +3,11 @@
 
 const CONFIG = {
   eventDate: '2026-08-15T10:00:00+07:00',
-  totalSeats: 100,
-  seatsTaken: 73,
+  totalSeats: 100,      // ค่าเริ่มต้น — /api/seats จะทับด้วยค่าจริงจาก DB
+  seatsTaken: 73,       // ค่าเริ่มต้น — แสดงทันทีก่อน /api/seats ตอบ (กัน layout shift)
   customQuestion: '',   // เว้นว่าง = ใช้คำถามเริ่มต้นตามภาษา
-  endpoint: ''          // เว้นว่าง = ไม่ส่งไปที่ไหน (โชว์หน้าสำเร็จอย่างเดียว)
+  endpoint: '/api/register',
+  seatsEndpoint: '/api/seats'
 };
 
 const DICT = {
@@ -59,8 +60,13 @@ const DICT = {
     defaultQuestion: 'ถ้าคุณมี AI Team หรือ AI ที่จะช่วยงานในบริษัทหรือธุรกิจของคุณ อยากให้ช่วยงานด้านไหนเป็นอันดับแรก?',
     mQPh: 'พิมพ์คำตอบของคุณที่นี่...',
     mSubmit: 'ยืนยันการลงทะเบียน',
+    mSubmitting: 'กำลังส่ง...',
+    errGeneric: 'ลงทะเบียนไม่สำเร็จ กรุณาลองอีกครั้ง',
+    errEmail: 'อีเมลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง',
+    errNetwork: 'เชื่อมต่อไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง',
     sTitle: 'ลงทะเบียนสำเร็จ!',
     sSub: 'เราได้ส่งลิงก์ Zoom สำหรับเข้าร่วมงานไปที่อีเมลของคุณแล้ว ไว้เจอกันวันที่ 15 ส.ค. 🚀',
+    sSubNoEmail: 'จองที่นั่งของคุณเรียบร้อยแล้ว เราจะส่งลิงก์ Zoom ทางอีเมลให้ก่อนวันงาน ไว้เจอกันวันที่ 15 ส.ค. 🚀',
     sBtn: 'เยี่ยมเลย!',
     footer: 'สร้างด้วย ❤️ สำหรับผู้ที่อยากเป็นเจ้าของ AI Team'
   },
@@ -113,8 +119,13 @@ const DICT = {
     defaultQuestion: 'If you had an AI Team to help run your company or business, which area would you want it to handle first?',
     mQPh: 'Type your answer here...',
     mSubmit: 'Confirm registration',
+    mSubmitting: 'Sending...',
+    errGeneric: "Registration failed. Please try again.",
+    errEmail: 'That email looks invalid. Please check and try again.',
+    errNetwork: 'Connection failed. Check your internet and try again.',
     sTitle: "You're registered!",
     sSub: "We've sent the Zoom join link to your email. See you on Aug 15! 🚀",
+    sSubNoEmail: "Your seat is reserved. We'll email the Zoom link before the event. See you on Aug 15! 🚀",
     sBtn: 'Awesome!',
     footer: 'Made with ❤️ for future AI Team owners'
   }
@@ -123,19 +134,41 @@ const DICT = {
 const LEARN_COLORS = ['#FFD23F', '#4CC9F0', '#FF7BAC', '#06D6A0'];
 const CASE_COLORS = ['#FFD23F', '#4CC9F0', '#FF7BAC', '#06D6A0', '#FF5A5F', '#FFD23F'];
 
-const state = { lang: 'th', modalOpen: false, submitted: false };
+const state = { lang: 'th', modalOpen: false, submitted: false, emailSent: true };
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const pad = (n) => String(n).padStart(2, '0');
 
-/* ── Seats ─────────────────────────────────────────────────── */
-const total = CONFIG.totalSeats;
-const taken = Math.min(total, CONFIG.seatsTaken);
-const left = Math.max(0, total - taken);
-const pct = total > 0 ? Math.min(100, Math.round((taken / total) * 100)) : 0;
+const VALUES = { total: 0, taken: 0, left: 0, days: '00', hours: '00', mins: '00', secs: '00' };
 
-const VALUES = { total, taken, left, days: '00', hours: '00', mins: '00', secs: '00' };
+/* ── Seats ─────────────────────────────────────────────────── */
+/* เรียกได้ทั้งตอน boot (ค่าจาก CONFIG), หลัง GET /api/seats และหลังลงทะเบียนสำเร็จ */
+function applySeats({ total, taken }) {
+  VALUES.total = Math.max(0, total);
+  VALUES.taken = Math.min(VALUES.total, Math.max(0, taken));
+  VALUES.left = Math.max(0, VALUES.total - VALUES.taken);
+
+  const pct = VALUES.total > 0 ? Math.min(100, Math.round((VALUES.taken / VALUES.total) * 100)) : 0;
+  const fill = $('#barFill');
+  fill.style.width = pct + '%';
+  fill.style.borderRight = pct > 0 && pct < 100 ? '3px solid #1A1A2E' : '';
+
+  paintValues();
+}
+
+async function loadSeats() {
+  if (!CONFIG.seatsEndpoint) return;
+  try {
+    const res = await fetch(CONFIG.seatsEndpoint, { headers: { Accept: 'application/json' } });
+    if (!res.ok) return;
+    const seats = await res.json();
+    if (Number.isFinite(seats?.total) && Number.isFinite(seats?.taken)) applySeats(seats);
+  } catch (err) {
+    // แถบที่นั่งพังไม่ควรทำให้หน้าเว็บพัง — คงเลขเริ่มต้นจาก CONFIG ไว้
+    console.warn('โหลดจำนวนที่นั่งไม่สำเร็จ', err);
+  }
+}
 
 function paintValues() {
   $$('[data-v]').forEach((el) => { el.textContent = VALUES[el.dataset.v]; });
@@ -149,6 +182,8 @@ function paintText() {
   $$('[data-t]').forEach((el) => { el.textContent = d[el.dataset.t]; });
   $$('[data-ph]').forEach((el) => { el.placeholder = d[el.dataset.ph]; });
   $('#questionLabel').textContent = (CONFIG.customQuestion || '').trim() || d.defaultQuestion;
+  // ข้อความหน้าสำเร็จเปลี่ยนตามว่าอีเมลส่งออกได้จริงหรือไม่ — อย่าอ้างว่าส่งแล้วถ้าไม่ได้ส่ง
+  $('#doneSub').textContent = state.emailSent ? d.sSub : d.sSubNoEmail;
   document.documentElement.lang = state.lang;
   document.title = `${d.title} — Webinar`;
   renderLists();
@@ -197,6 +232,7 @@ function openModal() {
   lastFocused = document.activeElement;
   state.modalOpen = true;
   state.submitted = false;
+  hideError();
   $('#modalForm').hidden = false;
   $('#modalDone').hidden = true;
   overlay.hidden = false;
@@ -217,6 +253,22 @@ function showDone() {
   $('#modalDone').hidden = false;
 }
 
+/* ── Error ในฟอร์ม ─────────────────────────────────────────── */
+const errorBox = $('#formError');
+let errorKey = null;   // เก็บ key ไว้เพื่อแปลข้อความใหม่เมื่อสลับภาษา
+
+function showError(key) {
+  errorKey = key;
+  errorBox.textContent = t()[key] || t().errGeneric;
+  errorBox.hidden = false;
+}
+
+function hideError() {
+  errorKey = null;
+  errorBox.hidden = true;
+  errorBox.textContent = '';
+}
+
 /* ── Wiring ────────────────────────────────────────────────── */
 $$('[data-open-modal]').forEach((b) => b.addEventListener('click', openModal));
 $$('[data-close-modal]').forEach((b) => b.addEventListener('click', closeModal));
@@ -229,6 +281,7 @@ $('#langBtn').addEventListener('click', () => {
   state.lang = state.lang === 'th' ? 'en' : 'th';
   paintText();
   paintValues();
+  if (errorKey) showError(errorKey);   // แปลข้อความ error ที่ค้างอยู่ตามภาษาใหม่
 });
 
 $('#regForm').addEventListener('submit', async (e) => {
@@ -239,30 +292,56 @@ $('#regForm').addEventListener('submit', async (e) => {
   const data = Object.fromEntries(new FormData(form).entries());
   data.lang = state.lang;
 
-  if (CONFIG.endpoint) {
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    try {
-      await fetch(CONFIG.endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-    } catch (err) {
-      console.error('ส่งข้อมูลลงทะเบียนไม่สำเร็จ', err);
-    } finally {
-      btn.disabled = false;
-    }
+  hideError();
+
+  // ไม่มี endpoint (เช่นเปิดไฟล์ตรงๆ) → โชว์หน้าสำเร็จอย่างเดียวเหมือนเวอร์ชันดีไซน์
+  if (!CONFIG.endpoint) {
+    form.reset();
+    showDone();
+    return;
   }
 
-  form.reset();
-  showDone();
+  const btn = form.querySelector('button[type="submit"]');
+  const btnLabel = btn.querySelector('[data-t]');
+  btn.disabled = true;
+  btnLabel.textContent = t().mSubmitting;
+
+  try {
+    const res = await fetch(CONFIG.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    let body = null;
+    try { body = await res.json(); } catch { /* คำตอบไม่ใช่ JSON — ถือว่าล้มเหลว */ }
+
+    // สำเร็จเท่านั้นจึงโชว์หน้าสำเร็จ — ล้มเหลวต้องบอกผู้ใช้ ไม่ปล่อยให้ lead หายเงียบ
+    if (!res.ok || !body?.ok) {
+      showError(body?.errors?.email ? 'errEmail' : 'errGeneric');
+      console.error('ลงทะเบียนไม่สำเร็จ', res.status, body);
+      return;
+    }
+
+    if (body.seats) applySeats(body.seats);
+    state.emailSent = body.emailSent !== false;
+    $('#doneSub').textContent = state.emailSent ? t().sSub : t().sSubNoEmail;
+
+    form.reset();
+    showDone();
+  } catch (err) {
+    // ไม่ reset ฟอร์ม — ผู้ใช้กด submit ซ้ำได้โดยไม่ต้องกรอกใหม่
+    showError('errNetwork');
+    console.error('ส่งข้อมูลลงทะเบียนไม่สำเร็จ', err);
+  } finally {
+    btn.disabled = false;
+    btnLabel.textContent = t().mSubmit;
+  }
 });
 
 /* ── Boot ──────────────────────────────────────────────────── */
-$('#barFill').style.width = pct + '%';
-if (pct > 0 && pct < 100) $('#barFill').style.borderRight = '3px solid #1A1A2E';
+applySeats({ total: CONFIG.totalSeats, taken: CONFIG.seatsTaken });
 paintText();
-paintValues();
 tick();
 setInterval(tick, 1000);
+loadSeats();   // ทับด้วยเลขจริงจาก DB (non-blocking)

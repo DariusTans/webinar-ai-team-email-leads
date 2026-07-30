@@ -328,7 +328,23 @@ input:focus, textarea:focus { outline: none; box-shadow: 4px 4px 0 var(--red); }
   box-shadow: 5px 5px 0 var(--ink);
   justify-content: center;
 }
-.btn-submit:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+.btn-submit:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+.btn-submit:disabled { background: #cfcfd6; cursor: not-allowed; transform: none; }
+
+/* ข้อความ error ในฟอร์ม */
+.form-error {
+  margin: 0; padding: 12px 14px;
+  background: var(--red); color: var(--cream);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-size: 14px; font-weight: 600;
+}
+
+/* honeypot — ซ่อนจากคน แต่บอทยังเห็นและกรอก (ห้ามใช้ display:none ล้วน) */
+.hp {
+  position: absolute; left: -9999px;
+  width: 1px; height: 1px; overflow: hidden;
+}
 .done { padding: 44px 30px; text-align: center; }
 .done-mark {
   width: 76px; height: 76px; margin: 0 auto 20px;

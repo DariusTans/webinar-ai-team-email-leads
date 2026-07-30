@@ -178,6 +178,11 @@
             <span class="field-label" id="questionLabel"></span>
             <textarea name="q" rows="3" data-ph="mQPh"></textarea>
           </label>
+          <!-- honeypot: คนจริงมองไม่เห็น ถ้ามีค่าคือบอท -->
+          <div class="hp" aria-hidden="true">
+            <label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <p class="form-error" id="formError" role="alert" hidden></p>
           <button type="submit" class="btn btn-submit"><span data-t="mSubmit"></span> ✓</button>
         </form>
       </div>
@@ -186,7 +191,7 @@
         <div class="done">
           <div class="done-mark">🎉</div>
           <div class="done-title" data-t="sTitle"></div>
-          <p class="done-sub" data-t="sSub"></p>
+          <p class="done-sub" id="doneSub"></p>
           <button type="button" class="btn btn-primary" data-close-modal><span data-t="sBtn"></span></button>
         </div>
       </div>
