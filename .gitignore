@@ -1,0 +1,16 @@
+node_modules/
+
+# secrets — เก็บเฉพาะ .env.example ที่เป็นชื่อตัวแปรล้วน
+.env
+.env.*
+!.env.example
+
+.vercel/
+
+# ไฟล์สำรอง lead ในเครื่อง (ห้ามขึ้น repo — มีข้อมูลส่วนบุคคล)
+data/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

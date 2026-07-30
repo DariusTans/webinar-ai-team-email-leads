@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>จากคนใช้ AI สู่เจ้าของ AI Team — Webinar</title>
+<meta name="description" content="Webinar ฟรี 90 นาที: AI ยุคถัดไปที่เจ้าของธุรกิจต้องรู้ก่อนใคร">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Nav ─────────────────────────────────────────────── -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="brand-mark">🤖</div>
+        <div class="brand-name">AI TEAM</div>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="btn btn-ghost" id="langBtn">🌐 <span data-t="langBtn"></span></button>
+        <button type="button" class="btn btn-primary" data-open-modal><span data-t="navRegister"></span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Hero ────────────────────────────────────────────── -->
+  <section class="wrap hero-wrap">
+    <div class="hero">
+      <!-- ถ้าไม่มีไฟล์วิดีโอ พื้นหลัง hero จะเป็นสีเข้ม #12122a แทนโดยอัตโนมัติ -->
+      <video class="hero-video" autoplay muted loop playsinline>
+        <source src="assets/demo-pixels-small.mp4" type="video/mp4">
+      </video>
+      <div class="hero-scrim"></div>
+      <div class="hero-dots"></div>
+
+      <div class="hero-badge"><span data-t="badge"></span></div>
+      <div class="hero-seats">
+        <span class="dot-live"></span>
+        <span data-t="seatsLeftLbl"></span>: <span data-v="left"></span>/<span data-v="total"></span>
+      </div>
+
+      <div class="hero-body">
+        <div class="hero-kicker">// <span data-t="kicker"></span></div>
+        <h1 class="hero-title" data-t="title"></h1>
+        <p class="hero-sub" data-t="subtitle"></p>
+        <div class="hero-cta">
+          <button type="button" class="btn btn-primary btn-lg" data-open-modal><span data-t="leadBtn"></span> →</button>
+        </div>
+        <div class="hero-meta">
+          <span>🎟 <span data-t="metaFree"></span></span>
+          <span>📅 <span data-t="metaDate"></span></span>
+          <span>▶ <span data-t="metaZoom"></span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Countdown ───────────────────────────────────────── -->
+  <section class="wrap countdown-wrap">
+    <div class="countdown-title">⏳ <span data-t="cdTitle"></span></div>
+
+    <div class="countdown-live" id="cdLive" hidden data-t="cdLive"></div>
+
+    <div class="countdown" id="cdUnits">
+      <div class="cd-cell cd-yellow">
+        <div class="cd-num" data-v="days"></div>
+        <div class="cd-label" data-t="cdDays"></div>
+      </div>
+      <div class="cd-colon">:</div>
+      <div class="cd-cell cd-cyan">
+        <div class="cd-num" data-v="hours"></div>
+        <div class="cd-label" data-t="cdHours"></div>
+      </div>
+      <div class="cd-colon">:</div>
+      <div class="cd-cell cd-pink">
+        <div class="cd-num" data-v="mins"></div>
+        <div class="cd-label" data-t="cdMins"></div>
+      </div>
+      <div class="cd-colon">:</div>
+      <div class="cd-cell cd-green">
+        <div class="cd-num cd-num-green" data-v="secs"></div>
+        <div class="cd-label" data-t="cdSecs"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Seats ───────────────────────────────────────────── -->
+  <section class="seats-wrap">
+    <div class="seats">
+      <div class="seats-head">
+        <div>
+          <div class="seats-title">🔥 <span data-t="seatsTitle"></span></div>
+          <div class="seats-lead">
+            <span data-t="seatsLead"></span>
+            <b class="seats-total" data-v="total"></b>
+            <span data-t="seatsUnit"></span>
+          </div>
+        </div>
+        <div class="seats-left">
+          <div class="seats-left-num" data-v="left"></div>
+          <div class="seats-left-lbl" data-t="seatsLeftLbl"></div>
+        </div>
+      </div>
+      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+      <div class="seats-foot">
+        <span>✅ <span data-v="taken"></span> <span data-t="seatsTakenLbl"></span></span>
+        <span>⚡ <span data-t="seatsHurry"></span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Learn ───────────────────────────────────────────── -->
+  <section class="wrap section">
+    <div class="section-head">
+      <h2 class="section-title" data-t="learnTitle"></h2>
+      <p class="section-sub" data-t="learnSub"></p>
+    </div>
+    <div class="learn-grid" id="learnGrid"></div>
+  </section>
+
+  <!-- ── Cases ───────────────────────────────────────────── -->
+  <section class="wrap section">
+    <div class="section-head">
+      <div class="pill">CASE / DEMO</div>
+      <h2 class="section-title" data-t="casesTitle"></h2>
+      <p class="section-sub" data-t="casesSub"></p>
+    </div>
+    <div class="cases-grid" id="casesGrid"></div>
+  </section>
+
+  <!-- ── CTA ─────────────────────────────────────────────── -->
+  <section class="wrap cta-wrap">
+    <div class="cta">
+      <h2 class="cta-title" data-t="ctaTitle"></h2>
+      <p class="cta-sub" data-t="ctaSub"></p>
+      <button type="button" class="btn btn-white btn-lg" data-open-modal><span data-t="ctaBtn"></span> 🚀</button>
+    </div>
+  </section>
+
+  <footer class="footer" data-t="footer"></footer>
+
+  <!-- ── Modal ───────────────────────────────────────────── -->
+  <div class="overlay" id="overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+      <div id="modalForm">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title" id="modalTitle" data-t="mTitle"></div>
+            <div class="modal-sub" data-t="mSub"></div>
+          </div>
+          <button type="button" class="modal-close" id="closeBtn" aria-label="Close">×</button>
+        </div>
+        <form class="form" id="regForm" novalidate>
+          <label class="field">
+            <span class="field-label"><span data-t="mEmail"></span> <span class="req">*</span></span>
+            <input type="email" name="email" required data-ph="mEmailPh">
+          </label>
+          <label class="field">
+            <span class="field-label"><span data-t="mName"></span> <span class="req">*</span></span>
+            <input type="text" name="name" required data-ph="mNamePh">
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label" data-t="mIG"></span>
+              <input type="text" name="ig" data-ph="mIGPh">
+            </label>
+            <label class="field">
+              <span class="field-label" data-t="mFB"></span>
+              <input type="text" name="fb" data-ph="mFBPh">
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label" id="questionLabel"></span>
+            <textarea name="q" rows="3" data-ph="mQPh"></textarea>
+          </label>
+          <button type="submit" class="btn btn-submit"><span data-t="mSubmit"></span> ✓</button>
+        </form>
+      </div>
+
+      <div id="modalDone" hidden>
+        <div class="done">
+          <div class="done-mark">🎉</div>
+          <div class="done-title" data-t="sTitle"></div>
+          <p class="done-sub" data-t="sSub"></p>
+          <button type="button" class="btn btn-primary" data-close-modal><span data-t="sBtn"></span></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
