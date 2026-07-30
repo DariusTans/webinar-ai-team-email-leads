@@ -14,7 +14,7 @@
     "resend": "^4.0.1"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "devDependencies": {
     "jsdom": "^29.1.1"
