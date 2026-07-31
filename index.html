@@ -178,9 +178,11 @@
             <span class="field-label" id="questionLabel"></span>
             <textarea name="q" rows="3" data-ph="mQPh"></textarea>
           </label>
-          <!-- honeypot: คนจริงมองไม่เห็น ถ้ามีค่าคือบอท -->
+          <!-- honeypot: คนจริงมองไม่เห็น ถ้ามีค่าคือบอท
+               ห้ามตั้งชื่อฟิลด์/label เป็นคำที่ browser รู้จัก (company, address, phone ...)
+               Chrome เมิน autocomplete="off" แล้ว autofill ทับให้ → คนจริงถูกตัดสินว่าเป็นบอท -->
           <div class="hp" aria-hidden="true">
-            <label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+            <label>hp-zzz<input type="text" name="hp_zzz" tabindex="-1" autocomplete="off"></label>
           </div>
           <p class="form-error" id="formError" role="alert" hidden></p>
           <button type="submit" class="btn btn-submit"><span data-t="mSubmit"></span> ✓</button>

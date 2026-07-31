@@ -74,11 +74,17 @@ function check(name, cond, extra = '') {
 {
   calls.length = 0;
   const res = mockRes();
-  await register(post({ email: 'bot@spam.com', name: 'Bot', company: 'Acme Corp' }), res);
+  await register(post({ email: 'bot@spam.com', name: 'Bot', hp_zzz: 'Acme Corp' }), res);
 
   console.log('\n[2] honeypot');
   check('ตอบ 200 (ไม่บอกบอทว่าถูกจับ)', res.statusCode === 200);
   check('ไม่แตะ DB เลย', calls.length === 0, `→ ${calls.length} queries`);
+
+  // ฟิลด์ชื่อ company ต้องไม่ทริก honeypot อีก — Chrome autofill กรอกให้เองแล้วคนจริงหาย
+  calls.length = 0;
+  const res2 = mockRes();
+  await register(post({ email: 'real@person.com', name: 'Real', company: 'Autofilled Inc' }), res2);
+  check('ฟิลด์ company ไม่ทริก honeypot (กัน autofill)', calls.length > 0, `→ ${calls.length} queries`);
 }
 
 // ── 3. validation ───────────────────────────────────────────

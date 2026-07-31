@@ -63,11 +63,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'method' });
   }
 
-  const { ok, spam, errors, data } = validate(parseBody(req.body));
+  const body = parseBody(req.body);
+  const { ok, spam, errors, data } = validate(body);
 
   // บอทติด honeypot — ตอบ 200 เงียบๆ อย่าให้รู้ว่าถูกจับได้
   if (spam) {
-    console.warn('[register] honeypot ทำงาน — ไม่บันทึก');
+    // log อีเมลเต็ม (ไม่ mask) เพราะเคสนี้ไม่มีร่องรอยที่อื่นเลย — ไม่ลง DB ไม่ลงไฟล์สำรอง
+    // ถ้า false positive (autofill/password manager กรอกฟิลด์กับดัก) นี่คือทางเดียวที่กู้ lead คืนได้
+    console.warn('[register] honeypot ทำงาน — ไม่บันทึก:', JSON.stringify({
+      email: String(body.email || '').slice(0, 254),
+      name: String(body.name || '').slice(0, 120),
+      trap: String(body.hp_zzz || '').slice(0, 120),
+      userAgent: String(req.headers['user-agent'] || '').slice(0, 200)
+    }));
     return res.status(200).json({ ok: true, emailSent: false });
   }
 

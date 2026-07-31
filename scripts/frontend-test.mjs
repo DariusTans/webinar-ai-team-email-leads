@@ -45,7 +45,7 @@ async function boot(fetchImpl) {
     const form = $('#regForm');
     Object.assign(form.querySelector('[name=email]'), { value: fields.email ?? 'a@b.com' });
     Object.assign(form.querySelector('[name=name]'), { value: fields.name ?? 'ทดสอบ' });
-    if (fields.company) form.querySelector('[name=company]').value = fields.company;
+    if (fields.hp_zzz) form.querySelector('[name=hp_zzz]').value = fields.hp_zzz;
     form.dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
     await new Promise((r) => setTimeout(r, 30));
     return form;
@@ -204,11 +204,13 @@ const jsonRes = (body, status = 200) => Promise.resolve({
     url === '/api/register' ? jsonRes({ ok: true, emailSent: false }) : jsonRes({ total: 100, taken: 73 }));
 
   $('[data-open-modal]').click();
-  await submitForm({ company: 'Bot Inc' });
+  await submitForm({ hp_zzz: 'Bot Inc' });
 
   const sent = JSON.parse(fetchCalls.find((c) => c.url === '/api/register').opts.body);
-  check('ส่งฟิลด์ company ไปให้ server ตรวจ', sent.company === 'Bot Inc');
-  check('honeypot ถูกซ่อนจากผู้ใช้ (class .hp)', $('.hp') !== null && $('.hp [name=company]') !== null);
+  check('ส่งฟิลด์กับดักไปให้ server ตรวจ', sent.hp_zzz === 'Bot Inc');
+  check('honeypot ถูกซ่อนจากผู้ใช้ (class .hp)', $('.hp') !== null && $('.hp [name=hp_zzz]') !== null);
+  // ชื่อที่ browser autofill รู้จักต้องไม่มีในฟอร์มเลย ไม่งั้นคนจริงโดนตัดสินว่าเป็นบอท
+  check('ไม่มีฟิลด์ชื่อ company ในฟอร์ม', $('[name=company]') === null);
 }
 
 console.log(`\n${'─'.repeat(50)}\nผ่าน ${pass} / ล้มเหลว ${fail}`);

@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 
 # secrets — เก็บเฉพาะ .env.example ที่เป็นชื่อตัวแปรล้วน
 .env
